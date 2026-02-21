@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PubPages — Turn your content into SEO-powered websites</title>
+    <meta name="description" content="Transform Telegram channels, Reddit communities, and YouTube content into search-engine-optimized web pages. Get discovered on Google, Yandex, and Perplexity.">
+    <meta property="og:title" content="PubPages — SEO platform for creators">
+    <meta property="og:description" content="Turn your Telegram, Reddit & YouTube into pages Google can find.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pubpages.xyz">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="ru_RU">
+    <meta property="og:locale:alternate" content="es_ES">
+    <meta property="og:locale:alternate" content="pt_BR">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://pubpages.xyz">
+    <link rel="alternate" hreflang="en" href="https://pubpages.xyz">
+    <link rel="alternate" hreflang="ru" href="https://pubpages.xyz?lang=ru">
+    <link rel="alternate" hreflang="es" href="https://pubpages.xyz?lang=es">
+    <link rel="alternate" hreflang="pt" href="https://pubpages.xyz?lang=pt">
+    <link rel="alternate" hreflang="x-default" href="https://pubpages.xyz">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Satoshi:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #06070b;
+            --surface: #0d0f16;
+            --surface-2: #13161f;
+            --surface-3: #191d28;
+            --border: #1b1f2e;
+            --border-hover: #262b3d;
+            --dim: #3f4560;
+            --muted: #5c6282;
+            --mid: #858bab;
+            --text: #b4b9d1;
+            --bright: #dfe2f0;
+            --white: #f4f5fb;
+            --blue: #4f7df9;
+            --blue-soft: #6b94ff;
+            --blue-bg: rgba(79, 125, 249, 0.08);
+            --blue-border: rgba(79, 125, 249, 0.15);
+            --blue-glow: rgba(79, 125, 249, 0.2);
+            --green: #34d399;
+            --green-bg: rgba(52, 211, 153, 0.08);
+            --green-border: rgba(52, 211, 153, 0.15);
+            --orange: #fb923c;
+            --orange-bg: rgba(251, 146, 60, 0.08);
+            --orange-border: rgba(251, 146, 60, 0.12);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* === GRAIN + AMBIENT === */
+        .grain {
+            position: fixed; inset: 0; pointer-events: none; z-index: 9000;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.018'/%3E%3C/svg%3E");
+        }
+
+        .glow-top {
+            position: fixed; top: -400px; left: 50%; transform: translateX(-50%);
+            width: 1000px; height: 800px; pointer-events: none; z-index: 0;
+            background: radial-gradient(ellipse, rgba(79, 125, 249, 0.04) 0%, transparent 70%);
+        }
+
+        /* === NAV === */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 0 40px; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+            backdrop-filter: blur(16px); background: rgba(6, 7, 11, 0.75);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600; font-size: 1rem;
+            color: var(--white); text-decoration: none;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .logo-mark {
+            width: 24px; height: 24px; border-radius: 6px;
+            background: linear-gradient(135deg, var(--blue), #8b5cf6);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 16px var(--blue-glow);
+        }
+
+        .logo-mark svg { width: 14px; height: 14px; }
+
+        .nav-center { display: flex; align-items: center; gap: 28px; }
+
+        .nav-link {
+            font-size: 0.88rem; font-weight: 500;
+            color: var(--muted); text-decoration: none;
+            transition: color 0.25s;
+        }
+        .nav-link:hover { color: var(--bright); }
+
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+
+        /* LANG SWITCHER */
+        .lang-switch {
+            position: relative; display: flex; align-items: center;
+        }
+
+        .lang-current {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 12px; border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem; font-weight: 500;
+            color: var(--mid); background: var(--surface);
+            border: 1px solid var(--border); cursor: pointer;
+            transition: all 0.25s;
+        }
+        .lang-current:hover { border-color: var(--border-hover); color: var(--bright); }
+
+        .lang-current svg { width: 12px; height: 12px; transition: transform 0.25s; }
+        .lang-switch.open .lang-current svg { transform: rotate(180deg); }
+
+        .lang-dropdown {
+            position: absolute; top: calc(100% + 8px); right: 0;
+            min-width: 140px; padding: 6px;
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: 10px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+            opacity: 0; visibility: hidden; transform: translateY(-4px);
+            transition: all 0.2s;
+        }
+        .lang-switch.open .lang-dropdown {
+            opacity: 1; visibility: visible; transform: translateY(0);
+        }
+
+        .lang-option {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 12px; border-radius: 6px;
+            font-size: 0.85rem; color: var(--mid);
+            cursor: pointer; transition: all 0.15s;
+        }
+        .lang-option:hover { background: var(--surface-3); color: var(--bright); }
+        .lang-option.active { color: var(--blue-soft); }
+        .lang-option .flag { font-size: 1rem; }
+
+        /* === MAIN CONTENT === */
+        .container {
+            position: relative; z-index: 1;
+            max-width: 1080px; margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        /* === HERO === */
+        .hero {
+            padding: 160px 0 100px;
+            text-align: center;
+        }
+
+        .pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 7px 18px 7px 14px; border-radius: 100px;
+            background: var(--green-bg); border: 1px solid var(--green-border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.73rem; font-weight: 500;
+            color: var(--green); letter-spacing: 0.02em;
+            margin-bottom: 36px;
+            animation: fadeIn 0.7s ease both;
+        }
+
+        .pill-dot {
+            width: 6px; height: 6px; background: var(--green);
+            border-radius: 50%; animation: blink 2.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
+        }
+
+        h1 {
+            font-size: clamp(2.6rem, 6vw, 4.2rem);
+            font-weight: 800; line-height: 1.08;
+            letter-spacing: -0.03em; color: var(--white);
+            margin-bottom: 20px;
+            animation: fadeUp 0.7s ease 0.08s both;
+        }
+
+        h1 .hl { color: var(--blue-soft); }
+
+        .hero-sub {
+            font-size: 1.12rem; color: var(--mid);
+            max-width: 540px; margin: 0 auto 44px;
+            line-height: 1.7;
+            animation: fadeUp 0.7s ease 0.16s both;
+        }
+
+        .hero-actions {
+            display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+            animation: fadeUp 0.7s ease 0.24s both;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 13px 26px; border-radius: 10px;
+            font-family: 'Satoshi', sans-serif;
+            font-weight: 600; font-size: 0.93rem;
+            text-decoration: none; cursor: pointer;
+            border: none; transition: all 0.25s;
+        }
+
+        .btn-blue {
+            background: var(--blue); color: #fff;
+            box-shadow: 0 2px 20px var(--blue-glow);
+        }
+        .btn-blue:hover { background: var(--blue-soft); transform: translateY(-1px); box-shadow: 0 6px 28px var(--blue-glow); }
+
+        .btn-ghost {
+            background: var(--surface); color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { border-color: var(--border-hover); color: var(--bright); background: var(--surface-2); }
+
+        /* === URL SHOWCASE === */
+        .showcase {
+            padding: 0 0 100px;
+            animation: fadeUp 0.7s ease 0.32s both;
+        }
+
+        .showcase-label {
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; text-transform: uppercase;
+            letter-spacing: 0.14em; color: var(--dim);
+            margin-bottom: 20px;
+        }
+
+        .url-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; max-width: 780px; margin: 0 auto;
+        }
+
+        .url-card {
+            padding: 20px; border-radius: 12px;
+            background: var(--surface); border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+        .url-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+
+        .url-path {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem; color: var(--blue-soft);
+            margin-bottom: 8px;
+        }
+
+        .url-desc {
+            font-size: 0.82rem; color: var(--muted); line-height: 1.5;
+        }
+
+        /* === FEATURES === */
+        .features { padding: 80px 0; }
+
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem; text-transform: uppercase;
+            letter-spacing: 0.14em; color: var(--blue);
+            margin-bottom: 12px;
+        }
+
+        .section-label.center, h2.center, .section-sub.center {
+            text-align: center;
+        }
+
+        h2 {
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+            font-weight: 800; line-height: 1.1;
+            letter-spacing: -0.025em; color: var(--white);
+            margin-bottom: 14px;
+        }
+
+        .section-sub {
+            font-size: 1.05rem; color: var(--mid);
+            max-width: 480px; margin-bottom: 52px;
+        }
+
+        .section-sub.center { margin-left: auto; margin-right: auto; }
+
+        .feat-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .feat {
+            padding: 32px 28px; border-radius: 14px;
+            background: var(--surface); border: 1px solid var(--border);
+            transition: all 0.35s; position: relative; overflow: hidden;
+        }
+
+        .feat::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 1px; background: linear-gradient(90deg, transparent, var(--blue-border), transparent);
+            opacity: 0; transition: opacity 0.35s;
+        }
+        .feat:hover::before { opacity: 1; }
+        .feat:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+
+        .feat-icon {
+            width: 42px; height: 42px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; margin-bottom: 18px;
+        }
+
+        .feat-icon.blue { background: var(--blue-bg); }
+        .feat-icon.green { background: var(--green-bg); }
+        .feat-icon.orange { background: var(--orange-bg); }
+
+        .feat h3 {
+            font-size: 1.05rem; font-weight: 700;
+            color: var(--bright); margin-bottom: 8px;
+        }
+
+        .feat p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+        /* === HOW === */
+        .how { padding: 80px 0; }
+
+        .steps {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px; position: relative;
+        }
+
+        .steps::before {
+            content: ''; position: absolute;
+            top: 40px; left: 16.66%; right: 16.66%;
+            height: 1px; background: linear-gradient(90deg, var(--border), var(--blue-border), var(--border));
+        }
+
+        .step {
+            text-align: center; padding: 0 16px;
+            position: relative;
+        }
+
+        .step-num {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: var(--surface-2); border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem; font-weight: 600; color: var(--blue-soft);
+            margin: 0 auto 20px; position: relative; z-index: 1;
+        }
+
+        .step h3 {
+            font-size: 1.05rem; font-weight: 700;
+            color: var(--bright); margin-bottom: 8px;
+        }
+
+        .step p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+        /* === PRICING === */
+        .pricing { padding: 80px 0; }
+
+        .price-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .price-card {
+            padding: 36px 28px; border-radius: 14px;
+            background: var(--surface); border: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            transition: all 0.3s; position: relative;
+        }
+        .price-card:hover { border-color: var(--border-hover); }
+
+        .price-card.pop {
+            border-color: var(--blue-border);
+            box-shadow: 0 0 40px rgba(79, 125, 249, 0.06);
+        }
+
+        .price-badge {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            padding: 3px 14px; border-radius: 100px;
+            background: var(--blue); color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem; font-weight: 600;
+            letter-spacing: 0.06em; text-transform: uppercase;
+        }
+
+        .price-name {
+            font-size: 0.9rem; font-weight: 600;
+            color: var(--muted); margin-bottom: 8px;
+        }
+
+        .price-amount {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.4rem; font-weight: 600;
+            color: var(--white); margin-bottom: 4px; line-height: 1;
+        }
+
+        .price-period {
+            font-size: 0.82rem; color: var(--dim);
+            margin-bottom: 28px;
+        }
+
+        .price-list {
+            list-style: none; flex: 1;
+            margin-bottom: 28px;
+        }
+
+        .price-list li {
+            padding: 8px 0; font-size: 0.88rem;
+            color: var(--mid); display: flex;
+            align-items: baseline; gap: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .price-list li::before {
+            content: '✓'; color: var(--blue-soft);
+            font-weight: 700; font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .price-card .btn { width: 100%; justify-content: center; }
+
+        /* === CTA === */
+        .cta {
+            padding: 80px 0 100px; text-align: center;
+        }
+
+        .cta-box {
+            padding: 64px 48px; border-radius: 18px;
+            background: var(--surface); border: 1px solid var(--border);
+            position: relative; overflow: hidden;
+        }
+
+        .cta-box::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--blue), transparent);
+        }
+
+        .cta-box h2 { margin-bottom: 12px; }
+        .cta-box .section-sub { margin-bottom: 36px; }
+
+        /* === FOOTER === */
+        footer {
+            position: relative; z-index: 1;
+            padding: 28px 40px; border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 16px;
+        }
+
+        .foot-copy {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.73rem; color: var(--dim);
+        }
+
+        .foot-links { display: flex; gap: 20px; }
+
+        .foot-links a {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.73rem; color: var(--dim);
+            text-decoration: none; transition: color 0.25s;
+        }
+        .foot-links a:hover { color: var(--mid); }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .nav-center { display: none; }
+            .container { padding: 0 20px; }
+            .hero { padding: 130px 0 70px; }
+            .url-grid, .feat-grid, .steps, .price-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px; margin-left: auto; margin-right: auto;
+            }
+            .steps::before { display: none; }
+            .cta-box { padding: 40px 24px; }
+            footer { padding: 24px 20px; flex-direction: column; text-align: center; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 2.2rem; }
+        }
+
+        /* === SCROLL REVEAL === */
+        .sr {
+            opacity: 0; transform: translateY(24px);
+            transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .sr.vis { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+    <div class="grain"></div>
+    <div class="glow-top"></div>
+
+    <!-- NAV -->
+    <nav>
+        <a href="/" class="logo">
+            <span class="logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+            pubpages
+        </a>
+        <div class="nav-center">
+            <a href="#features" class="nav-link" data-i18n="nav_features">Features</a>
+            <a href="#how" class="nav-link" data-i18n="nav_how">How it works</a>
+            <a href="#pricing" class="nav-link" data-i18n="nav_pricing">Pricing</a>
+        </div>
+        <div class="nav-right">
+            <div class="lang-switch" id="langSwitch">
+                <div class="lang-current" onclick="toggleLang()">
+                    <span id="langLabel">EN</span>
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4.5l3 3 3-3"/></svg>
+                </div>
+                <div class="lang-dropdown">
+                    <div class="lang-option active" onclick="setLang('en')"><span class="flag">🇬🇧</span> English</div>
+                    <div class="lang-option" onclick="setLang('ru')"><span class="flag">🇷🇺</span> Русский</div>
+                    <div class="lang-option" onclick="setLang('es')"><span class="flag">🇪🇸</span> Español</div>
+                    <div class="lang-option" onclick="setLang('pt')"><span class="flag">🇧🇷</span> Português</div>
+                </div>
+            </div>
+            <a href="https://t.me/PubPagesBot" class="btn btn-blue" style="padding:9px 20px; font-size:0.85rem;" data-i18n="nav_cta">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <div class="pill">
+                <span class="pill-dot"></span>
+                <span data-i18n="hero_pill">Early Access — Join Now</span>
+            </div>
+
+            <h1 data-i18n-html="hero_title">Your content.<br>On <span class="hl">every</span> search engine.</h1>
+
+            <p class="hero-sub" data-i18n="hero_sub">PubPages turns Telegram channels, subreddits, and YouTube into SEO-optimized websites. Every post becomes a page discoverable on Google, Yandex, and Perplexity.</p>
+
+            <div class="hero-actions">
+                <a href="https://t.me/PubPagesBot" class="btn btn-blue" data-i18n="hero_cta1">Start with Telegram Bot →</a>
+                <a href="https://reddit.com/r/pubpages" class="btn btn-ghost" data-i18n="hero_cta2">Join r/pubpages</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- URL SHOWCASE -->
+    <section class="showcase">
+        <div class="container">
+            <div class="showcase-label" data-i18n="showcase_label">How your content looks</div>
+            <div class="url-grid">
+                <div class="url-card">
+                    <div class="url-path">pubpages.xyz/<span style="color:var(--green)">@channel</span></div>
+                    <div class="url-desc" data-i18n="url_tg">Telegram channel as a full website with every post indexed</div>
+                </div>
+                <div class="url-card">
+                    <div class="url-path">pubpages.xyz/<span style="color:var(--orange)">r/community</span></div>
+                    <div class="url-desc" data-i18n="url_reddit">Subreddit as a searchable knowledge base</div>
+                </div>
+                <div class="url-card">
+                    <div class="url-path">pubpages.xyz/<span style="color:var(--blue-soft)">topic/anything</span></div>
+                    <div class="url-desc" data-i18n="url_topic">Learn Anything — best content aggregated by topic</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-label center" data-i18n="feat_label">Features</div>
+            <h2 class="center" data-i18n="feat_title">Everything to get discovered</h2>
+            <p class="section-sub center" data-i18n="feat_sub">From auto-parsing to analytics — all you need to turn invisible content into search traffic.</p>
+
+            <div class="feat-grid">
+                <div class="feat sr">
+                    <div class="feat-icon blue">🔍</div>
+                    <h3 data-i18n="f1_title">Auto SEO</h3>
+                    <p data-i18n="f1_desc">AI generates meta titles, descriptions, structured data, and OG-tags for every post automatically.</p>
+                </div>
+                <div class="feat sr">
+                    <div class="feat-icon green">📊</div>
+                    <h3 data-i18n="f2_title">Analytics</h3>
+                    <p data-i18n="f2_desc">Track search rankings, impressions, clicks, and conversions. See which posts bring traffic.</p>
+                </div>
+                <div class="feat sr">
+                    <div class="feat-icon orange">⚡</div>
+                    <h3 data-i18n="f3_title">Instant Indexing</h3>
+                    <p data-i18n="f3_desc">New posts are pushed to Google via IndexNow. Appear in search within hours, not weeks.</p>
+                </div>
+                <div class="feat sr">
+                    <div class="feat-icon blue">📅</div>
+                    <h3 data-i18n="f4_title">Scheduled Posts</h3>
+                    <p data-i18n="f4_desc">Create posts in dashboard, schedule for later. Cross-post to Telegram and Reddit at once.</p>
+                </div>
+                <div class="feat sr">
+                    <div class="feat-icon green">🌍</div>
+                    <h3 data-i18n="f5_title">Multi-language</h3>
+                    <p data-i18n="f5_desc">Pages in EN, RU, ES, PT with proper hreflang tags. Reach audiences worldwide.</p>
+                </div>
+                <div class="feat sr">
+                    <div class="feat-icon orange">🔗</div>
+                    <h3 data-i18n="f6_title">Custom Domains</h3>
+                    <p data-i18n="f6_desc">Use your own domain or get a subdomain on pubpages. Full white-label on Business plan.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="how" id="how">
+        <div class="container">
+            <div class="section-label center" data-i18n="how_label">How it works</div>
+            <h2 class="center" data-i18n="how_title">Three steps. Zero coding.</h2>
+            <p class="section-sub center" data-i18n="how_sub">Connect your channel — we handle everything else.</p>
+
+            <div class="steps sr">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h3 data-i18n="s1_title">Connect</h3>
+                    <p data-i18n="s1_desc">Add @PubPagesBot to your Telegram channel or link your Reddit/YouTube account.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h3 data-i18n="s2_title">We process</h3>
+                    <p data-i18n="s2_desc">AI reads every post, generates SEO metadata, and creates optimized web pages.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h3 data-i18n="s3_title">Get found</h3>
+                    <p data-i18n="s3_desc">Pages are indexed in Google & Yandex. Track growth in your dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-label center" data-i18n="price_label">Pricing</div>
+            <h2 class="center" data-i18n="price_title">Start free. Scale when ready.</h2>
+            <p class="section-sub center" data-i18n="price_sub">No credit card required.</p>
+
+            <div class="price-grid sr">
+                <div class="price-card">
+                    <div class="price-name" data-i18n="plan_free">Free</div>
+                    <div class="price-amount">$0</div>
+                    <div class="price-period" data-i18n="plan_free_period">forever</div>
+                    <ul class="price-list">
+                        <li data-i18n="pf1">1 channel</li>
+                        <li data-i18n="pf2">100 posts/month</li>
+                        <li data-i18n="pf3">Basic SEO pages</li>
+                        <li data-i18n="pf4">Basic analytics</li>
+                    </ul>
+                    <a href="https://t.me/PubPagesBot" class="btn btn-ghost" data-i18n="plan_start">Get Started</a>
+                </div>
+                <div class="price-card pop">
+                    <div class="price-badge" data-i18n="plan_popular">Popular</div>
+                    <div class="price-name">Pro</div>
+                    <div class="price-amount">$12</div>
+                    <div class="price-period" data-i18n="plan_pro_period">per month</div>
+                    <ul class="price-list">
+                        <li data-i18n="pp1">5 channels</li>
+                        <li data-i18n="pp2">Unlimited posts</li>
+                        <li data-i18n="pp3">AI SEO optimization</li>
+                        <li data-i18n="pp4">Full analytics</li>
+                        <li data-i18n="pp5">Scheduled posts</li>
+                        <li data-i18n="pp6">Custom subdomain</li>
+                    </ul>
+                    <a href="https://t.me/PubPagesBot" class="btn btn-blue" data-i18n="plan_gopro">Go Pro</a>
+                </div>
+                <div class="price-card">
+                    <div class="price-name">Business</div>
+                    <div class="price-amount">$49</div>
+                    <div class="price-period" data-i18n="plan_biz_period">per month</div>
+                    <ul class="price-list">
+                        <li data-i18n="pb1">Unlimited channels</li>
+                        <li data-i18n="pb2">Custom domain</li>
+                        <li data-i18n="pb3">White-label</li>
+                        <li data-i18n="pb4">API access</li>
+                        <li data-i18n="pb5">Audience monetization</li>
+                    </ul>
+                    <a href="https://t.me/PubPagesBot" class="btn btn-ghost" data-i18n="plan_contact">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-box sr">
+                <h2 data-i18n-html="cta_title">Ready to be <span class="hl">found</span>?</h2>
+                <p class="section-sub center" data-i18n="cta_sub">Join early access. Takes 30 seconds.</p>
+                <div class="hero-actions">
+                    <a href="https://t.me/PubPagesBot" class="btn btn-blue" data-i18n="cta_btn1">Register Your Channel →</a>
+                    <a href="https://reddit.com/r/pubpages" class="btn btn-ghost" data-i18n="cta_btn2">Join Community</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <span class="foot-copy">© 2026 PubPages</span>
+        <div class="foot-links">
+            <a href="https://t.me/PubPages">Telegram</a>
+            <a href="https://reddit.com/r/pubpages">Reddit</a>
+            <a href="https://t.me/PubPagesBot">Bot</a>
+            <a href="mailto:hello@pubpages.xyz">hello@pubpages.xyz</a>
+        </div>
+    </footer>
+
+    <script>
+    // === I18N TRANSLATIONS ===
+    const T = {
+        en: {
+            nav_features: "Features", nav_how: "How it works", nav_pricing: "Pricing", nav_cta: "Get Started",
+            hero_pill: "Early Access — Join Now",
+            hero_title: 'Your content.<br>On <span class="hl">every</span> search engine.',
+            hero_sub: "PubPages turns Telegram channels, subreddits, and YouTube into SEO-optimized websites. Every post becomes a page discoverable on Google, Yandex, and Perplexity.",
+            hero_cta1: "Start with Telegram Bot →", hero_cta2: "Join r/pubpages",
+            showcase_label: "How your content looks",
+            url_tg: "Telegram channel as a full website with every post indexed",
+            url_reddit: "Subreddit as a searchable knowledge base",
+            url_topic: "Learn Anything — best content aggregated by topic",
+            feat_label: "Features", feat_title: "Everything to get discovered",
+            feat_sub: "From auto-parsing to analytics — all you need to turn invisible content into search traffic.",
+            f1_title: "Auto SEO", f1_desc: "AI generates meta titles, descriptions, structured data, and OG-tags for every post automatically.",
+            f2_title: "Analytics", f2_desc: "Track search rankings, impressions, clicks, and conversions. See which posts bring traffic.",
+            f3_title: "Instant Indexing", f3_desc: "New posts are pushed to Google via IndexNow. Appear in search within hours, not weeks.",
+            f4_title: "Scheduled Posts", f4_desc: "Create posts in dashboard, schedule for later. Cross-post to Telegram and Reddit at once.",
+            f5_title: "Multi-language", f5_desc: "Pages in EN, RU, ES, PT with proper hreflang tags. Reach audiences worldwide.",
+            f6_title: "Custom Domains", f6_desc: "Use your own domain or get a subdomain on pubpages. Full white-label on Business plan.",
+            how_label: "How it works", how_title: "Three steps. Zero coding.", how_sub: "Connect your channel — we handle everything else.",
+            s1_title: "Connect", s1_desc: "Add @PubPagesBot to your Telegram channel or link your Reddit/YouTube account.",
+            s2_title: "We process", s2_desc: "AI reads every post, generates SEO metadata, and creates optimized web pages.",
+            s3_title: "Get found", s3_desc: "Pages are indexed in Google & Yandex. Track growth in your dashboard.",
+            price_label: "Pricing", price_title: "Start free. Scale when ready.", price_sub: "No credit card required.",
+            plan_free: "Free", plan_free_period: "forever",
+            pf1: "1 channel", pf2: "100 posts/month", pf3: "Basic SEO pages", pf4: "Basic analytics", plan_start: "Get Started",
+            plan_popular: "Popular", plan_pro_period: "per month",
+            pp1: "5 channels", pp2: "Unlimited posts", pp3: "AI SEO optimization", pp4: "Full analytics", pp5: "Scheduled posts", pp6: "Custom subdomain", plan_gopro: "Go Pro",
+            plan_biz_period: "per month",
+            pb1: "Unlimited channels", pb2: "Custom domain", pb3: "White-label", pb4: "API access", pb5: "Audience monetization", plan_contact: "Contact Us",
+            cta_title: 'Ready to be <span class="hl">found</span>?', cta_sub: "Join early access. Takes 30 seconds.",
+            cta_btn1: "Register Your Channel →", cta_btn2: "Join Community"
+        },
+        ru: {
+            nav_features: "Возможности", nav_how: "Как работает", nav_pricing: "Тарифы", nav_cta: "Начать",
+            hero_pill: "Ранний доступ — Присоединяйся",
+            hero_title: 'Твой контент.<br>Во <span class="hl">всех</span> поисковиках.',
+            hero_sub: "PubPages превращает Telegram-каналы, сабреддиты и YouTube в SEO-оптимизированные сайты. Каждый пост — страница, которую находят Google, Яндекс и Perplexity.",
+            hero_cta1: "Подключить через бот →", hero_cta2: "Сообщество r/pubpages",
+            showcase_label: "Как выглядит ваш контент",
+            url_tg: "Telegram-канал как полноценный сайт — каждый пост проиндексирован",
+            url_reddit: "Сабреддит как поисковая база знаний",
+            url_topic: "Learn Anything — лучший контент по любой теме",
+            feat_label: "Возможности", feat_title: "Всё для продвижения в поиске",
+            feat_sub: "От автопарсинга до аналитики — всё, чтобы невидимый контент стал поисковым трафиком.",
+            f1_title: "Авто-SEO", f1_desc: "ИИ генерирует мета-заголовки, описания, структурированные данные и OG-теги для каждого поста.",
+            f2_title: "Аналитика", f2_desc: "Отслеживайте позиции в поиске, показы, клики и конверсии. Смотрите какие посты приносят трафик.",
+            f3_title: "Мгновенная индексация", f3_desc: "Новые посты отправляются в Google через IndexNow. Появление в поиске за часы, а не недели.",
+            f4_title: "Отложенные посты", f4_desc: "Создавайте посты в дашборде, планируйте публикацию. Кросс-постинг в Telegram и Reddit одновременно.",
+            f5_title: "Мультиязычность", f5_desc: "Страницы на EN, RU, ES, PT с hreflang тегами. Охватывайте аудиторию по всему миру.",
+            f6_title: "Свой домен", f6_desc: "Подключите свой домен или используйте поддомен pubpages. White-label на тарифе Business.",
+            how_label: "Как это работает", how_title: "Три шага. Без кода.", how_sub: "Подключите канал — мы сделаем остальное.",
+            s1_title: "Подключите", s1_desc: "Добавьте @PubPagesBot в Telegram-канал или свяжите Reddit/YouTube аккаунт.",
+            s2_title: "Мы обрабатываем", s2_desc: "ИИ анализирует каждый пост, генерирует SEO-метаданные и создаёт оптимизированные страницы.",
+            s3_title: "Вас находят", s3_desc: "Страницы индексируются в Google и Яндекс. Следите за ростом в дашборде.",
+            price_label: "Тарифы", price_title: "Начните бесплатно. Растите когда готовы.", price_sub: "Без карты и обязательств.",
+            plan_free: "Бесплатно", plan_free_period: "навсегда",
+            pf1: "1 канал", pf2: "100 постов/мес", pf3: "Базовые SEO-страницы", pf4: "Базовая аналитика", plan_start: "Начать",
+            plan_popular: "Популярный", plan_pro_period: "в месяц",
+            pp1: "5 каналов", pp2: "Безлимит постов", pp3: "AI SEO-оптимизация", pp4: "Полная аналитика", pp5: "Отложенные посты", pp6: "Свой поддомен", plan_gopro: "Подключить Pro",
+            plan_biz_period: "в месяц",
+            pb1: "Безлимит каналов", pb2: "Свой домен", pb3: "White-label", pb4: "Доступ к API", pb5: "Монетизация аудитории", plan_contact: "Связаться",
+            cta_title: 'Готовы быть <span class="hl">найденными</span>?', cta_sub: "Присоединяйтесь к раннему доступу. 30 секунд.",
+            cta_btn1: "Зарегистрировать канал →", cta_btn2: "Сообщество"
+        },
+        es: {
+            nav_features: "Funciones", nav_how: "Cómo funciona", nav_pricing: "Precios", nav_cta: "Empezar",
+            hero_pill: "Acceso anticipado — Únete",
+            hero_title: 'Tu contenido.<br>En <span class="hl">todos</span> los buscadores.',
+            hero_sub: "PubPages convierte canales de Telegram, subreddits y YouTube en sitios web optimizados para SEO. Cada publicación se convierte en una página que Google, Yandex y Perplexity pueden descubrir.",
+            hero_cta1: "Empieza con el Bot →", hero_cta2: "Únete a r/pubpages",
+            showcase_label: "Cómo se ve tu contenido",
+            url_tg: "Canal de Telegram como sitio web completo con cada post indexado",
+            url_reddit: "Subreddit como base de conocimiento buscable",
+            url_topic: "Learn Anything — el mejor contenido agregado por tema",
+            feat_label: "Funciones", feat_title: "Todo para ser descubierto",
+            feat_sub: "Desde auto-análisis hasta analíticas — todo lo necesario para convertir contenido invisible en tráfico.",
+            f1_title: "SEO Automático", f1_desc: "La IA genera meta títulos, descripciones, datos estructurados y OG-tags para cada post.",
+            f2_title: "Analíticas", f2_desc: "Rastrea rankings, impresiones, clics y conversiones. Ve qué posts generan tráfico.",
+            f3_title: "Indexación Instantánea", f3_desc: "Los nuevos posts se envían a Google vía IndexNow. Aparece en búsquedas en horas, no semanas.",
+            f4_title: "Posts Programados", f4_desc: "Crea posts en el dashboard, prográmalos. Publica en Telegram y Reddit a la vez.",
+            f5_title: "Multi-idioma", f5_desc: "Páginas en EN, RU, ES, PT con etiquetas hreflang. Alcanza audiencias en todo el mundo.",
+            f6_title: "Dominios Propios", f6_desc: "Usa tu propio dominio o un subdominio de pubpages. White-label en plan Business.",
+            how_label: "Cómo funciona", how_title: "Tres pasos. Sin código.", how_sub: "Conecta tu canal — nosotros hacemos el resto.",
+            s1_title: "Conecta", s1_desc: "Agrega @PubPagesBot a tu canal de Telegram o vincula tu cuenta de Reddit/YouTube.",
+            s2_title: "Procesamos", s2_desc: "La IA lee cada post, genera metadatos SEO y crea páginas web optimizadas.",
+            s3_title: "Te encuentran", s3_desc: "Las páginas se indexan en Google y Yandex. Monitorea el crecimiento en tu dashboard.",
+            price_label: "Precios", price_title: "Empieza gratis. Escala cuando quieras.", price_sub: "Sin tarjeta de crédito.",
+            plan_free: "Gratis", plan_free_period: "para siempre",
+            pf1: "1 canal", pf2: "100 posts/mes", pf3: "Páginas SEO básicas", pf4: "Analíticas básicas", plan_start: "Empezar",
+            plan_popular: "Popular", plan_pro_period: "por mes",
+            pp1: "5 canales", pp2: "Posts ilimitados", pp3: "Optimización SEO con IA", pp4: "Analíticas completas", pp5: "Posts programados", pp6: "Subdominio propio", plan_gopro: "Ir Pro",
+            plan_biz_period: "por mes",
+            pb1: "Canales ilimitados", pb2: "Dominio propio", pb3: "White-label", pb4: "Acceso API", pb5: "Monetización de audiencia", plan_contact: "Contactar",
+            cta_title: '¿Listo para ser <span class="hl">encontrado</span>?', cta_sub: "Únete al acceso anticipado. 30 segundos.",
+            cta_btn1: "Registra tu canal →", cta_btn2: "Comunidad"
+        },
+        pt: {
+            nav_features: "Recursos", nav_how: "Como funciona", nav_pricing: "Preços", nav_cta: "Começar",
+            hero_pill: "Acesso antecipado — Entre agora",
+            hero_title: 'Seu conteúdo.<br>Em <span class="hl">todos</span> os buscadores.',
+            hero_sub: "PubPages transforma canais do Telegram, subreddits e YouTube em sites otimizados para SEO. Cada post vira uma página encontrável no Google, Yandex e Perplexity.",
+            hero_cta1: "Comece com o Bot →", hero_cta2: "Entre no r/pubpages",
+            showcase_label: "Como seu conteúdo aparece",
+            url_tg: "Canal do Telegram como site completo com cada post indexado",
+            url_reddit: "Subreddit como base de conhecimento pesquisável",
+            url_topic: "Learn Anything — melhor conteúdo agregado por tema",
+            feat_label: "Recursos", feat_title: "Tudo para ser descoberto",
+            feat_sub: "De auto-análise a métricas — tudo para transformar conteúdo invisível em tráfego de busca.",
+            f1_title: "SEO Automático", f1_desc: "IA gera meta títulos, descrições, dados estruturados e OG-tags para cada post automaticamente.",
+            f2_title: "Analytics", f2_desc: "Acompanhe rankings, impressões, cliques e conversões. Veja quais posts trazem tráfego.",
+            f3_title: "Indexação Instantânea", f3_desc: "Novos posts são enviados ao Google via IndexNow. Apareça em buscas em horas, não semanas.",
+            f4_title: "Posts Agendados", f4_desc: "Crie posts no dashboard, agende para depois. Publique no Telegram e Reddit ao mesmo tempo.",
+            f5_title: "Multi-idioma", f5_desc: "Páginas em EN, RU, ES, PT com tags hreflang. Alcance audiências no mundo todo.",
+            f6_title: "Domínios Próprios", f6_desc: "Use seu próprio domínio ou um subdomínio pubpages. White-label no plano Business.",
+            how_label: "Como funciona", how_title: "Três passos. Sem código.", how_sub: "Conecte seu canal — cuidamos do resto.",
+            s1_title: "Conecte", s1_desc: "Adicione @PubPagesBot ao seu canal do Telegram ou vincule sua conta Reddit/YouTube.",
+            s2_title: "Processamos", s2_desc: "IA lê cada post, gera metadados SEO e cria páginas web otimizadas.",
+            s3_title: "Seja encontrado", s3_desc: "Páginas são indexadas no Google e Yandex. Acompanhe o crescimento no dashboard.",
+            price_label: "Preços", price_title: "Comece grátis. Escale quando quiser.", price_sub: "Sem cartão de crédito.",
+            plan_free: "Grátis", plan_free_period: "para sempre",
+            pf1: "1 canal", pf2: "100 posts/mês", pf3: "Páginas SEO básicas", pf4: "Analytics básico", plan_start: "Começar",
+            plan_popular: "Popular", plan_pro_period: "por mês",
+            pp1: "5 canais", pp2: "Posts ilimitados", pp3: "Otimização SEO com IA", pp4: "Analytics completo", pp5: "Posts agendados", pp6: "Subdomínio próprio", plan_gopro: "Ir Pro",
+            plan_biz_period: "por mês",
+            pb1: "Canais ilimitados", pb2: "Domínio próprio", pb3: "White-label", pb4: "Acesso API", pb5: "Monetização de audiência", plan_contact: "Contato",
+            cta_title: 'Pronto para ser <span class="hl">encontrado</span>?', cta_sub: "Entre no acesso antecipado. 30 segundos.",
+            cta_btn1: "Registre seu canal →", cta_btn2: "Comunidade"
+        }
+    };
+
+    const LANG_LABELS = { en: 'EN', ru: 'RU', es: 'ES', pt: 'PT' };
+
+    let currentLang = 'en';
+
+    function detectLang() {
+        const params = new URLSearchParams(window.location.search);
+        const paramLang = params.get('lang');
+        if (paramLang && T[paramLang]) return paramLang;
+        const stored = localStorage.getItem('pubpages_lang');
+        if (stored && T[stored]) return stored;
+        const browserLang = navigator.language.slice(0, 2);
+        if (T[browserLang]) return browserLang;
+        return 'en';
+    }
+
+    function applyLang(lang) {
+        currentLang = lang;
+        document.documentElement.lang = lang;
+        localStorage.setItem('pubpages_lang', lang);
+
+        // Update URL without reload
+        const url = new URL(window.location);
+        if (lang === 'en') url.searchParams.delete('lang');
+        else url.searchParams.set('lang', lang);
+        history.replaceState(null, '', url);
+
+        // Update page title
+        const titles = {
+            en: 'PubPages — Turn your content into SEO-powered websites',
+            ru: 'PubPages — Превратите контент в SEO-оптимизированные сайты',
+            es: 'PubPages — Convierte tu contenido en sitios web SEO',
+            pt: 'PubPages — Transforme seu conteúdo em sites SEO'
+        };
+        document.title = titles[lang];
+
+        // Apply text translations
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (T[lang][key]) el.textContent = T[lang][key];
+        });
+
+        // Apply HTML translations (for spans inside)
+        document.querySelectorAll('[data-i18n-html]').forEach(el => {
+            const key = el.getAttribute('data-i18n-html');
+            if (T[lang][key]) el.innerHTML = T[lang][key];
+        });
+
+        // Update lang switcher
+        document.getElementById('langLabel').textContent = LANG_LABELS[lang];
+        document.querySelectorAll('.lang-option').forEach(opt => {
+            opt.classList.toggle('active', opt.getAttribute('onclick').includes(`'${lang}'`));
+        });
+    }
+
+    function setLang(lang) {
+        applyLang(lang);
+        closeLang();
+    }
+
+    function toggleLang() {
+        document.getElementById('langSwitch').classList.toggle('open');
+    }
+
+    function closeLang() {
+        document.getElementById('langSwitch').classList.remove('open');
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.lang-switch')) closeLang();
+    });
+
+    // Scroll reveal
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.sr').forEach(el => obs.observe(el));
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+            e.preventDefault();
+            const t = document.querySelector(a.getAttribute('href'));
+            if (t) t.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // Init
+    applyLang(detectLang());
+    </script>
+</body>
+</html>
